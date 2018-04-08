@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="TQ&#39;s Blog">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;背景：前年做网站Retina优化时顺手上了webp格式图片，但没有用我司自己的DIS系统，而是用了七牛云的服务，原因是在同等图片体积的情况下，七牛云提供的切图更加清晰。今年收到了运维同事的需求，希望将webp格式图片从七牛切回，并提供了多种图片处理方案供选择。 &amp;emsp;&amp;emsp;那么问题来了，如何判断两张图片的清晰度孰优孰劣？以往都是依赖钛合金狗眼。但这种人肉办法只在">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-30T01:03:36.053Z">
+<meta property="og:updated_time" content="2018-03-30T01:24:37.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="图像清晰度评价方法">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;背景：前年做网站Retina优化时顺手上了webp格式图片，但没有用我司自己的DIS系统，而是用了七牛云的服务，原因是在同等图片体积的情况下，七牛云提供的切图更加清晰。今年收到了运维同事的需求，希望将webp格式图片从七牛切回，并提供了多种图片处理方案供选择。 &amp;emsp;&amp;emsp;那么问题来了，如何判断两张图片的清晰度孰优孰劣？以往都是依赖钛合金狗眼。但这种人肉办法只在">
@@ -310,8 +310,10 @@
 <h3 id="Laplacian-Tenengrad"><a href="#Laplacian-Tenengrad" class="headerlink" title="Laplacian(Tenengrad)"></a>Laplacian(Tenengrad)</h3><p>与Brenner只取一个方向的梯度不同，这两个算法，计算了水平方向和垂直方向的梯度值，函数定义如下：</p>
 <p>$$ D(I) = \displaystyle{\sum_{x}}\displaystyle{\sum_{y}}[S(x,y)]^2 \ \ \ \ (S(x,y)&gt;T)$$</p>
 <p>$$ S(x,y)=I_x^2(x,y)+I_y^2(x,y) $$</p>
-<p>两个算法的区别仅在于算子不同，Tenengrad使用了 <a href="https://baike.baidu.com/item/Sobel%E7%AE%97%E5%AD%90" target="_blank" rel="noopener">Sobel算子</a> ，Laplacian的算子为：</p>
+<p>两个算法的区别仅在于算子不同，Tenengrad使用了 <a href="https://baike.baidu.com/item/Sobel%E7%AE%97%E5%AD%90" target="_blank" rel="noopener">Sobel算子</a> ，论文里Laplacian的算子为：</p>
 <p>$$<br>  L = \frac{1}{6} \begin{matrix}<br>   1 &amp; 4 &amp; 1 \\<br>   4 &amp; -20 &amp; 4 \\<br>   1 &amp; 4 &amp; 1<br>  \end{matrix}<br> $$</p>
+<p>但opencv的<a href="https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=laplacian#laplacian" target="_blank" rel="noopener">文档</a>里Laplacian算子为：</p>
+<p>$$<br>  L = \begin{matrix}<br>   0 &amp; 1 &amp; 0 \\<br>   1 &amp; -4 &amp; 1 \\<br>   0 &amp; 1 &amp; 0<br>  \end{matrix}<br>$$</p>
 <p>opencv库中有现成的Laplacian方法，示例代码如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">laplacian</span><span class="params">(img)</span>:</span></span><br><span class="line">    img = cv2.Laplacian(img, cv2.CV_64F)</span><br><span class="line">    img = np.absolute(img)</span><br><span class="line">    img[img &lt; <span class="number">50</span>] = <span class="number">0</span>     <span class="comment">#人工设定的阈值</span></span><br><span class="line">    <span class="keyword">return</span> np.mean(img)</span><br></pre></td></tr></table></figure>
 <p>代码中并没有做平方处理，因为平方后返回值大的离谱了，有空时需要查看opencv的Laplacian方法源码。这些算法都是用来做图像的边缘检测，和CNN里的卷积Filter其实是一码事，但均没有提到padding这个事，也需要看看源码是怎么处理的。</p>
